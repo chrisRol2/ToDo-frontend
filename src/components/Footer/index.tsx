@@ -1,5 +1,6 @@
+import { Footer } from "./styles";
 const index = () => {
-  return <div>index</div>;
+  return <Footer>index</Footer>;
 };
 
 export default index;
