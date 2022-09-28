@@ -1,24 +1,25 @@
-import styled from "styled-components";
-
-const NavBarContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ffffff55;
-  padding: 0 20px;
-  height: 60px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-  padding: 0;
-  margin: 0;
-  backdrop-filter: blur(10px);
-`;
-
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+import { AccountContext } from "../../context/account/account";
+import { Button, Img, NameLogo, NavBarContainer, NavLink } from "./syles";
 const NavBar = () => {
-  return <NavBarContainer>NavBar</NavBarContainer>;
+  const { logout, account } = useContext(AccountContext);
+
+  return (
+    <NavBarContainer>
+      <NameLogo>CRUD</NameLogo>
+      {account ? (
+        <div>
+          <Button onClick={logout}>Logout</Button>
+          <NavLink to="/dashboard">Dashboard</NavLink>
+          <span>{account?.account.username}</span>
+          <Img src={account?.account.img} alt="" />
+        </div>
+      ) : (
+        <Link to={"/login"}>Login</Link>
+      )}
+    </NavBarContainer>
+  );
 };
 
 export default NavBar;
