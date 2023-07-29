@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import Countdown from "../../components/Countdown";
 import { AccountContext } from "../../context/account/account";
 import { DashboardContainer, Header, Main } from "./styles";
 const getItems = async (username: string, token: string) => {
@@ -68,6 +69,7 @@ const addItem = async (
   items: any,
   item: any
 ) => {
+  console.log(JSON.stringify(item));
   const response = await fetch(`${process.env.REACT_APP_API_URL}/items`, {
     method: "POST",
     headers: {
@@ -77,6 +79,8 @@ const addItem = async (
     body: JSON.stringify({
       username: username,
       name: item.name,
+      description: item.description,
+      expireAt: item.expireAt,
       isDone: item.isDone,
     }),
   });
@@ -99,11 +103,15 @@ const Dashboard = () => {
     }
     const item = {
       name: e.target.name.value,
+      description: e.target.description.value,
       isDone: e.target.isDone.checked,
+      expireAt: new Date(e.target.expirationDate.value).getTime(),
     };
     addItem(getUser().username, getToken(), setItems, items, item);
     e.target.name.value = "";
     e.target.isDone.checked = false;
+    e.target.description.value = "";
+    e.target.expirationDate.value = "";
   };
 
   useEffect(() => {
@@ -124,6 +132,21 @@ const Dashboard = () => {
 
     setItems(newItems);
   };
+  const [minDateTime, setMinDateTime] = useState("");
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = ("0" + (now.getMonth() + 1)).slice(-2);
+    const day = ("0" + now.getDate()).slice(-2);
+    const hours = ("0" + now.getHours()).slice(-2);
+    const minutes = ("0" + now.getMinutes()).slice(-2);
+
+    const datetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    setMinDateTime(datetime);
+  });
   return (
     <Main>
       <DashboardContainer>
@@ -141,41 +164,66 @@ const Dashboard = () => {
         </Header>
         <ul>
           {items && items.length > 0
-            ? items.map((item: any) => (
-                <li key={item._id}>
-                  <span>{item.name}</span>
-                  <div>
-                    <input
-                      type="checkbox"
-                      name="isDone"
-                      id={item._id}
-                      checked={item.isDone}
-                      onChange={onChanges}
-                    />
-                    <button
-                      onClick={() => {
-                        deleteItem(
-                          getUser().username,
-                          getToken(),
-                          item,
-                          setItems,
-                          items
-                        );
-                      }}
-                    >
-                      X
-                    </button>
-                  </div>
-                </li>
-              ))
+            ? items.map((item: any) => {
+                // console.log(item);
+                return (
+                  <li key={item._id}>
+                    <div>
+                      <span>{item.name}</span>
+                      <div>
+                        <input
+                          type="checkbox"
+                          name="isDone"
+                          id={item._id}
+                          checked={item.isDone}
+                          onChange={onChanges}
+                        />
+                        <button
+                          onClick={() => {
+                            deleteItem(
+                              getUser().username,
+                              getToken(),
+                              item,
+                              setItems,
+                              items
+                            );
+                          }}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                      <span className="description">
+                        <hr />
+                        {item.description}
+                      </span>
+                      <Countdown futureTimestamp={item.expireAt} />
+                    </div>
+                  </li>
+                );
+              })
             : "No items"}
           <li key={"add item"}>
             <form onSubmit={addOneItem}>
-              <input type="text" name="name" id="" />
+              <input type="text" name="name" id="" placeholder="Name" />
               <div>
                 <input type="checkbox" name="isDone" id="1" />
-                <button type="submit">➕</button>
+                <button type="submit">💾</button>
               </div>
+              <label htmlFor="description">Description</label>
+              <textarea
+                name="description"
+                id="description"
+                className="description"
+              />
+              <input
+                type="datetime-local"
+                name="expirationDate"
+                min={minDateTime}
+                onChange={(e) => {
+                  const expirationDate = new Date(e.target.value);
+                  console.log(expirationDate.getTime());
+                }}
+              />
             </form>
           </li>
         </ul>
