@@ -164,7 +164,7 @@ const Dashboard = () => {
         </Header>
         <ul>
           {items && items.length > 0
-            ? items.map((item: any) => {
+            ? items.map((item: any, _: number, thisItems: any) => {
                 // console.log(item);
                 return (
                   <li key={item._id}>
@@ -185,7 +185,7 @@ const Dashboard = () => {
                               getToken(),
                               item,
                               setItems,
-                              items
+                              thisItems
                             );
                           }}
                         >
