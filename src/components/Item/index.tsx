@@ -6,14 +6,10 @@ const Item = ({
   item,
   onChanges,
   deleteItem,
-  setItems,
-  thisItems,
 }: {
   item: any;
   onChanges: any;
-  deleteItem: Function;
-  setItems: any;
-  thisItems: any;
+  deleteItem: any;
 }) => {
   const { getToken, getUser } = useContext(AccountContext);
   return (
@@ -28,19 +24,7 @@ const Item = ({
             checked={item.isDone}
             onChange={onChanges}
           />
-          <button
-            onClick={() => {
-              deleteItem(
-                getUser().username,
-                getToken(),
-                item,
-                setItems,
-                thisItems
-              );
-            }}
-          >
-            🗑️
-          </button>
+          <button onClick={deleteItem}>🗑️</button>
         </div>
         <span className="description">
           <hr />
