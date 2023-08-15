@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import Item from "../../components/Item";
+import ListItem from "../../components/ListItem";
 import { AccountContext } from "../../context/account/account";
 import { DashboardContainer, Header, Main } from "./styles";
 const getItems = async (username: string, token: string) => {
@@ -153,30 +154,30 @@ const Dashboard = () => {
         <Header>
           <div />
           <h1>Dashboard</h1>
-          <button
-            onClick={() => {
-              // addItem(getUser().username, getToken(), setItems, items);
-              console.log("add");
-            }}
-          >
-            ➕
-          </button>
+          <span />
         </Header>
-        <ul>
+        <ListItem>
           {items && items.length > 0
             ? items.map((item: any, _: number, thisItems: any) => {
-                // console.log(item);
                 return (
                   <Item
                     item={item}
                     onChanges={onChanges}
-                    deleteItem={deleteItem}
-                    setItems={setItems}
-                    thisItems={thisItems}
+                    deleteItem={() =>
+                      deleteItem(
+                        getUser().username,
+                        getToken(),
+                        item,
+                        setItems,
+                        items
+                      )
+                    }
                   />
                 );
               })
             : "No items"}
+          {/* </ul>
+        <ul> */}
           <li key={"add item"}>
             <form onSubmit={addOneItem}>
               <input type="text" name="name" id="" placeholder="Name" />
@@ -201,7 +202,7 @@ const Dashboard = () => {
               />
             </form>
           </li>
-        </ul>
+        </ListItem>
       </DashboardContainer>
     </Main>
   );
