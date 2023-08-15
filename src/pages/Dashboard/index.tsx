@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import Countdown from "../../components/Countdown";
+import Item from "../../components/Item";
 import { AccountContext } from "../../context/account/account";
 import { DashboardContainer, Header, Main } from "./styles";
 const getItems = async (username: string, token: string) => {
@@ -167,38 +167,13 @@ const Dashboard = () => {
             ? items.map((item: any, _: number, thisItems: any) => {
                 // console.log(item);
                 return (
-                  <li key={item._id}>
-                    <div>
-                      <span>{item.name}</span>
-                      <div>
-                        <input
-                          type="checkbox"
-                          name="isDone"
-                          id={item._id}
-                          checked={item.isDone}
-                          onChange={onChanges}
-                        />
-                        <button
-                          onClick={() => {
-                            deleteItem(
-                              getUser().username,
-                              getToken(),
-                              item,
-                              setItems,
-                              thisItems
-                            );
-                          }}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                      <span className="description">
-                        <hr />
-                        {item.description}
-                      </span>
-                      <Countdown futureTimestamp={item.expireAt} />
-                    </div>
-                  </li>
+                  <Item
+                    item={item}
+                    onChanges={onChanges}
+                    deleteItem={deleteItem}
+                    setItems={setItems}
+                    thisItems={thisItems}
+                  />
                 );
               })
             : "No items"}
