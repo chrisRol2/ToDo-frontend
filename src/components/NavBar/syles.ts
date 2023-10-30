@@ -9,7 +9,7 @@ const NavBarContainer = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
-  width: 100%;
+  /* width: 100%; */
   z-index: 1;
   padding: 0 2rem;
   margin: 0;
@@ -18,6 +18,7 @@ const NavBarContainer = styled.div`
     display: flex;
     align-items: center;
     font-size: 1.2rem;
+    outline: 10px solid red;
   }
 `;
 const Img = styled.img`
@@ -25,7 +26,7 @@ const Img = styled.img`
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 0 20px;
+  margin: 0 40px;
 `;
 const Button = styled.button`
   background-color: transparent;
@@ -48,4 +49,4 @@ const NavLink = styled(Link)`
   margin: 0 20px;
 `;
 
-export { NavBarContainer, Img, Button, NameLogo, NavLink };
+export { Button, Img, NameLogo, NavBarContainer, NavLink };

@@ -1,5 +1,3 @@
-import { useContext } from "react";
-import { AccountContext } from "../../context/account/account";
 import Countdown from "../Countdown";
 
 const Item = ({
@@ -11,7 +9,6 @@ const Item = ({
   onChanges: any;
   deleteItem: any;
 }) => {
-  const { getToken, getUser } = useContext(AccountContext);
   return (
     <li key={item._id}>
       <div>

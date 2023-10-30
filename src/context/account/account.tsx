@@ -13,27 +13,37 @@ const Account = ({ children }: any) => {
     const account = localStorage.getItem("account");
     if (account) {
       setAccount(JSON.parse(account));
+    } else {
+      history("/");
     }
-  }, []);
+  }, [history]);
 
   const getUser = () => {
-    return account.account;
+    return account;
   };
 
   const login = (account: any) => {
     setAccount(account);
-    localStorage.setItem("account", JSON.stringify(account));
+    localStorage.setItem(
+      "account",
+      JSON.stringify({ img: account.img, username: account.username })
+    );
+    localStorage.setItem("accessToken", account.accessToken);
+    localStorage.setItem("refreshToken", account.refreshToken);
+
     history("/dashboard");
   };
 
   const logout = () => {
     setAccount(null);
-    localStorage.removeItem("account");
+    localStorage.clear();
     history("/");
   };
 
   const getToken = () => {
-    return account ? account.account.accessToken : "";
+    const token = localStorage.getItem("accessToken");
+
+    return token;
   };
 
   return (

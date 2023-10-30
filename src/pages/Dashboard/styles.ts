@@ -138,6 +138,7 @@ const DashboardContainer = styled.div`
         border-radius: 5px;
         font-size: 1.2rem;
         font-weight: 500;
+        width: 100%;
         color: #3d3d4d;
         &::placeholder {
           color: #a8a8b3;
