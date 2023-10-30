@@ -18,7 +18,6 @@ const NavBarContainer = styled.div`
     display: flex;
     align-items: center;
     font-size: 1.2rem;
-    outline: 10px solid red;
   }
 `;
 const Img = styled.img`
