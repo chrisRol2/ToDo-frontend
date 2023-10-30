@@ -2,102 +2,55 @@ import { useContext, useEffect, useState } from "react";
 import Item from "../../components/Item";
 import ListItem from "../../components/ListItem";
 import { AccountContext } from "../../context/account/account";
+import CoreService from "../../services/CoreService";
 import { DashboardContainer, Header, Main } from "./styles";
-const getItems = async (username: string, token: string) => {
-  const response = await fetch(`${process.env.REACT_APP_API_URL}/items/all`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token,
-    },
-    body: JSON.stringify({ username: username }),
-  });
+const getItems = async () => {
+  const items = await CoreService.getItems();
 
-  const data = await response.json();
-  return data;
+  return items;
 };
-const setItem = async (username: string, token: string, item: any) => {
-  const response = await fetch(
-    `${process.env.REACT_APP_API_URL}/items/${item.name}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-      body: JSON.stringify({
-        username: username,
-        name: item.name,
-        isDone: item.isDone,
-      }),
-    }
-  );
+const setItem = async (item: any) => {
+  const response = await CoreService.setItem(item);
   return response;
 };
-const deleteItem = async (
-  username: string,
-  token: string,
-  item: any,
-  setItem: any,
-  items: any
-) => {
-  const response = await fetch(
-    `${process.env.REACT_APP_API_URL}/items/${item.name}`,
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-      },
-      body: JSON.stringify({
-        username: username,
-        name: item.name,
-      }),
-    }
-  );
-  const data = await response.json();
-  if (data.message === "deleted") {
+const deleteItem = async (item: any, setItem: any, items: any) => {
+  const response = await CoreService.deleteItem(item);
+  if (response.message === "deleted") {
     setItem(items.filter((i: any) => i.name !== item.name));
   }
-
   return response;
 };
 
 const addItem = async (
-  username: string,
-  token: string,
   setItem: any,
   items: any,
   item: any
-) => {
-  console.log(JSON.stringify(item));
-  const response = await fetch(`${process.env.REACT_APP_API_URL}/items`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token,
-    },
-    body: JSON.stringify({
-      username: username,
-      name: item.name,
-      description: item.description,
-      expireAt: item.expireAt,
-      isDone: item.isDone,
-    }),
-  });
-  const data = await response.json();
-  const status = await response.status;
-  if (status === 200) {
-    setItem([...items, data]);
+): Promise<Boolean> => {
+  try {
+    const alreadyExists = items.find((i: any) => i.name === item.name);
+    if (alreadyExists) {
+      console.log("already exists");
+      return false;
+    }
+    const response = await CoreService.addItem(item);
+    console.log("res:", response);
+    if (response.message === "created") {
+      setItem([...items, response.item]);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 };
 
 const Dashboard = () => {
-  const { getToken, getUser } = useContext(AccountContext);
+  const { getToken } = useContext(AccountContext);
 
   const [items, setItems] = useState([]);
 
-  const addOneItem = (e: any) => {
+  const addOneItem = async (e: any) => {
     e.preventDefault();
     if (e.target.name.value === "") {
       return;
@@ -108,25 +61,26 @@ const Dashboard = () => {
       isDone: e.target.isDone.checked,
       expireAt: new Date(e.target.expirationDate.value).getTime(),
     };
-    addItem(getUser().username, getToken(), setItems, items, item);
-    e.target.name.value = "";
-    e.target.isDone.checked = false;
-    e.target.description.value = "";
-    e.target.expirationDate.value = "";
+    if (await addItem(setItems, items, item)) {
+      e.target.name.value = "";
+      e.target.isDone.checked = false;
+      e.target.description.value = "";
+      e.target.expirationDate.value = "";
+    }
   };
 
   useEffect(() => {
     const token = getToken();
     if (token) {
-      getItems(getUser().username, token).then((data) => setItems(data));
+      getItems().then((data) => setItems(data));
     }
-  }, [getToken, getUser]);
+  }, [getToken]);
 
   const onChanges = (e: any) => {
     const newItems: any = items.map((item: any) => {
       if (item._id === e.target.id) {
         item.isDone = e.target.checked;
-        setItem(getUser().username, getToken(), item);
+        setItem(item);
       }
       return item;
     });
@@ -148,6 +102,7 @@ const Dashboard = () => {
 
     setMinDateTime(datetime);
   });
+
   return (
     <Main>
       <DashboardContainer>
@@ -163,15 +118,10 @@ const Dashboard = () => {
                   <Item
                     item={item}
                     onChanges={onChanges}
-                    deleteItem={() =>
-                      deleteItem(
-                        getUser().username,
-                        getToken(),
-                        item,
-                        setItems,
-                        items
-                      )
-                    }
+                    key={item._id}
+                    deleteItem={() => {
+                      deleteItem(item, setItems, items);
+                    }}
                   />
                 );
               })

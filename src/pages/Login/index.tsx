@@ -31,7 +31,7 @@ const Login = () => {
       const data = await res.json();
       if (data.status === "success") {
         setLoginStatus("success");
-        login(data);
+        login(data.account);
       }
       if (data.status !== "success") {
         setLoginStatus("Password or username is incorrect");

@@ -45,7 +45,7 @@ const Countdown: React.FC<CountdownProps> = ({ futureTimestamp }) => {
       } else if (diffInMilliseconds >= 1000) {
         // Less than 1 minute
         const seconds = Math.floor(diffInMilliseconds / 1000);
-        const milliseconds = diffInMilliseconds % 1000;
+        // const milliseconds = diffInMilliseconds % 1000;
         message = `${seconds} seconds`;
       } else {
         // Less than 1 second
